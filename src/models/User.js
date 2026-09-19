@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
     },
     employee: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
+    phone: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

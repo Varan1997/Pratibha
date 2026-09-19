@@ -8,14 +8,21 @@ const run = async () => {
 
   const email = process.env.SEED_ADMIN_EMAIL || 'admin@school.com';
   const password = process.env.SEED_ADMIN_PASSWORD || 'Admin@123';
+  const phone = process.env.SEED_ADMIN_PHONE || '7893858514';
 
   const existing = await User.findOne({ email });
 
   if (existing) {
-    console.log(`Admin already exists: ${email}`);
+    if (existing.phone !== phone) {
+      existing.phone = phone;
+      await existing.save();
+      console.log(`Admin already exists: ${email} (phone updated to ${phone})`);
+    } else {
+      console.log(`Admin already exists: ${email}`);
+    }
   } else {
-    await User.create({ name: 'Administrator', email, password, role: 'admin' });
-    console.log(`Admin created: ${email} / ${password}`);
+    await User.create({ name: 'Administrator', email, password, role: 'admin', phone });
+    console.log(`Admin created: ${email} / ${password} (phone: ${phone})`);
   }
 
   await mongoose.disconnect();
