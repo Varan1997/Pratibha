@@ -1,4 +1,13 @@
 import Student from '../models/Student.js';
+import { syncParentAccount } from '../utils/syncParentAccount.js';
+
+const syncParentAccountSafely = async (student) => {
+  try {
+    await syncParentAccount(student);
+  } catch (err) {
+    console.error('Failed to sync parent account:', err.message);
+  }
+};
 
 export const listStudents = async (req, res, next) => {
   try {
@@ -29,6 +38,7 @@ export const getStudent = async (req, res, next) => {
 export const createStudent = async (req, res, next) => {
   try {
     const student = await Student.create(req.body);
+    await syncParentAccountSafely(student);
     res.status(201).json(student);
   } catch (err) {
     next(err);
@@ -42,6 +52,7 @@ export const updateStudent = async (req, res, next) => {
       runValidators: true,
     });
     if (!student) return res.status(404).json({ message: 'Student not found' });
+    await syncParentAccountSafely(student);
     res.json(student);
   } catch (err) {
     next(err);
