@@ -40,9 +40,9 @@ export const login = async (req, res, next) => {
       return res.status(403).json({ message: 'Account is deactivated' });
     }
 
-    if (user.role === 'admin') {
+    if (['admin', 'teacher', 'staff'].includes(user.role)) {
       if (!user.phone) {
-        return res.status(400).json({ message: 'No phone number is configured for this admin account' });
+        return res.status(400).json({ message: 'No phone number is configured for this account' });
       }
 
       return res.json(await issueOtpChallenge(user));
@@ -128,6 +128,10 @@ export const register = async (req, res, next) => {
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email and password are required' });
+    }
+
+    if (['admin', 'teacher', 'staff'].includes(role || 'staff') && !phone) {
+      return res.status(400).json({ message: 'Phone number is required (used for OTP login)' });
     }
 
     const user = await User.create({ name, email, password, role, employee, children, phone });
